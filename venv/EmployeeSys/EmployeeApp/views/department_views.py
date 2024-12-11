@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 @api_view(['GET'])
 def department_list(request):
     departments = Department.objects.all()
-    data = [{"id" : department.id , "name" : departmen.name} for department in departments]
+    data = [{"id" : department.id , "name" : department.name} for department in departments]
     return JsonResponse(data,safe=False)
 
 

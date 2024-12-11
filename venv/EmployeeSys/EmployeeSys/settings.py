@@ -102,6 +102,19 @@ DATABASES = {
 
 
 }
+INSTALLED_APPS += [
+    "corsheaders",
+]
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    *MIDDLEWARE,
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",  # Add your frontend's origin
+    "http://192.168.x.x:8080",  # Replace with your machine's IP and port
+]
 
 
 # Password validation
