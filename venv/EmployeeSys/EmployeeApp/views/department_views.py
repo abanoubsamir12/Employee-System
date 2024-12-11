@@ -31,3 +31,33 @@ def department_detail(request, pk):
     department = get_object_or_404(Department, pk=pk)
     data = {"id" : department.id , "name" : department.name}
     return JsonResponse(data,safe = False)
+
+@swagger_auto_schema(
+    method='patch',
+    operation_description="Update a department (partial update)",
+    responses={200: 'Department updated successfully', 400: 'Bad Request'}
+)
+@api_view(['PATCH'])
+def department_update(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    try:
+        data = JSONParser().parse(request)  # Parse incoming JSON payload
+        if 'name' in data:
+            department.name = data['name']
+        department.save()
+        updated_data = {"id": department.id, "name": department.name}
+        return JsonResponse(updated_data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Delete a department",
+    responses={204: 'Department deleted successfully'}
+)
+@api_view(['DELETE'])
+def department_delete(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    department.delete()
+    return HttpResponse(status=204)

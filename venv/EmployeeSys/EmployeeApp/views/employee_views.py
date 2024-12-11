@@ -3,10 +3,12 @@ from django.views.decorators.http import require_http_methods
 from rest_framework.parsers import JSONParser
 from EmployeeApp.models.employee import Employee
 from django.contrib.auth.decorators import permission_required
-from ..serializers import EmployeeSerializer
+from EmployeeApp.serializers.employee_serializer import EmployeeSerializer
 import json
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from drf_yasg import openapi
+from rest_framework.permissions import AllowAny
 
 
 @swagger_auto_schema(
@@ -25,14 +27,19 @@ def employee_list(request):
 
 
 
+
 @swagger_auto_schema(
     method='post',
-    operation_description="create student and add to database",
-    responses={200: 'student created'}
+    request_body=EmployeeSerializer,  # Use the EmployeeSerializer for the request body schema
+    responses={
+        201: openapi.Response('Employee created successfully', EmployeeSerializer),
+        400: openapi.Response('Validation error'),
+    },
+    operation_description="Create a new employee",
 )
 
 @api_view(['POST'])
-@permission_required('EmployeeApp.can_add_user', raise_exception=True)
+@permission_classes([AllowAny])
 def employee_create(request):
     data = JSONParser().parse(request)
     serializer = EmployeeSerializer(data=data)
@@ -46,8 +53,8 @@ def employee_create(request):
 
 @swagger_auto_schema(
     method='get',
-    operation_description="Retrieve a student with specific id",
-    responses={200: 'retrieve the student'}
+    operation_description="Retrieve an employee with specific id",
+    responses={200: 'retrieve the employee'}
 )
 
 @api_view(['GET'])
@@ -67,7 +74,7 @@ def employee_detail(request,id):
 )
 
 @api_view(['PATCH'])
-@permission_required('EmployeeApp.can_edit_user', raise_exception=True)
+@permission_required('EmployeeApp.can_edit_employee', raise_exception=True)
 def employee_update(request,id):
     try:
         employee = Employee.objects.get(id=id)
@@ -85,12 +92,12 @@ def employee_update(request,id):
 
 @swagger_auto_schema(
     method='delete',
-    operation_description="delete a student",
-    responses={200: 'student deleted'}
+    operation_description="delete an employee",
+    responses={200: 'employee deleted'}
 )
 
 @api_view(['DELETE'])
-@permission_required('EmployeeApp.can_delete_user', raise_exception=True)
+@permission_required('EmployeeApp.can_delete_employee', raise_exception=True)
 def employee_delete(request,id):
     try:
         employee = Employee.objects.get(id=id)
@@ -99,12 +106,3 @@ def employee_delete(request,id):
     employee.delete()
     return JsonResponse({"message": "Employee deleted successfully"}, status=204)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({"message": "You have accessed a protected API!"})

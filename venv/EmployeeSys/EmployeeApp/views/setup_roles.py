@@ -1,39 +1,48 @@
 from django.http import JsonResponse
-from django.core.management import call_command
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import AllowAny
+
 from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+from EmployeeApp.models import Employee  # Replace with your model
 
 
 def setup_roles_and_permissions():
-    # Create roles
-    admin_group, _ = Group.objects.get_or_create(name='Admin')
-    manager_group, _ = Group.objects.get_or_create(name='Manager')
-    employee_group, _ = Group.objects.get_or_create(name='Employee')
+    
+    # Create Groups (Roles)
+    admin_group, _ = Group.objects.get_or_create(name='admin')
+    manager_group, _ = Group.objects.get_or_create(name='manager')
+    employee_group, _ = Group.objects.get_or_create(name='employee')
 
-    try:
-        # Assign permissions
-        view_users_permission = Permission.objects.get(codename='can_view_users')
-        add_user_permission = Permission.objects.get(codename='can_add_user')
-        edit_user_permission = Permission.objects.get(codename='can_edit_user')
-        delete_user_permission = Permission.objects.get(codename='can_delete_user')
+    # Create Permissions
+    content_type = ContentType.objects.get_for_model(Employee)
 
-        # Add permissions to admin
-        admin_group.permissions.add(view_users_permission)
-        admin_group.permissions.add(add_user_permission)
-        admin_group.permissions.add(edit_user_permission)
-        admin_group.permissions.add(delete_user_permission)
+    edit_permission, _ = Permission.objects.get_or_create(
+        codename='can_edit_employee',
+        name='Can Edit Employee',
+        content_type=content_type,
+    )
+    delete_permission, _ = Permission.objects.get_or_create(
+        codename='can_delete_employee',
+        name='Can Delete Employee',
+        content_type=content_type,
+    )
 
-        # Add permissions to manager
-        manager_group.permissions.add(view_users_permission)
-        manager_group.permissions.add(edit_user_permission)
-
-        # Add permissions to employee
-        employee_group.permissions.add(view_users_permission)
-
-        print("Roles and permissions have been set up successfully!")
-    except Permission.DoesNotExist as e:
-        print(f"Error: Permission does not exist: {e}")
+    # Assign Permissions to Groups
+    admin_group.permissions.add(edit_permission, delete_permission)
+    manager_group.permissions.add(edit_permission)
 
 
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="create permission",
+    responses={200: 'A list of permissions and groups'}
+)
+@api_view(['POST'])
+
+@permission_classes([AllowAny])
 def run_setup_roles(request):
     try:
         setup_roles_and_permissions()

@@ -3,7 +3,7 @@ from django.utils.timezone import now
 from datetime import date
 from .company import Company
 from .department import Department
-from .user import User
+from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 class WorkflowMixin:
     """Mixin to handle simple status transitions."""
@@ -18,14 +18,14 @@ class WorkflowMixin:
         return new_status in transitions.get(self.status, [])
 
 
-class Employee(WorkflowMixin, User):
+class Employee(WorkflowMixin, models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('hired', 'Hired'),
         ('active', 'Active'),
         ('terminated', 'Terminated'),
     )
-
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee', null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employees')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL,null=True, related_name='employees')
     name = models.CharField(max_length=255, blank=False, null=False)  
@@ -55,4 +55,4 @@ class Employee(WorkflowMixin, User):
             raise ValueError(f"Invalid status transition from {self.status} to {new_status}")
 
     def __str__(self):
-        return self.name
+        return self.user.username
