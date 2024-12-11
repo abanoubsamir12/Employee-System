@@ -10,7 +10,7 @@ Backend development:
   3- create authntication login with jwt
   3- create role-based access control by giving permissions and roles
   4- readoc about my apis just run the django app and add 'redoc' after your localhost url (use django redoc)
-  5- i used swagger created in django with details about all apis i created
+  5- i used swagger created in django with details about all apis i created just add 'swagger' after your locahost/
 frontend development:
   1- created all retrieve list of employee, departmend and company pages and integrated with backend
   2- created login page to login and generate token and modify axios configuration to add the token to every api i run
