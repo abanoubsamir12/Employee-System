@@ -1,0 +1,19 @@
+introduction: 
+actually i completed my military service 10 days ago, in the last 5 days during to some responsipilities (i finished it btw)
+i started the task 2 days ago so front-end pages like edit-create pages i did not apply in my project but login successfully and retreive objects in vue (this is the first time to work with vue)
+it was supposed to implement with frappe but it requires steps to work with frappe and there was no time for this so i worked django and now i will discuss what i do
+
+
+Backend development:
+  1- created all models employee,departmnet,company
+  2- created all crud operations for all the models
+  3- create authntication login with jwt
+  3- create role-based access control by giving permissions and roles
+  4- readoc about my apis just run the django app and add 'redoc' after your localhost url (use django redoc)
+  5- i used swagger created in django with details about all apis i created
+frontend development:
+  1- created all retrieve list of employee, departmend and company pages and integrated with backend
+  2- created login page to login and generate token and modify axios configuration to add the token to every api i run
+
+
+  sorry for not doing some requirements, thank you
